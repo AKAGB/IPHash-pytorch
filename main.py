@@ -10,11 +10,11 @@ from utils.tools import *
 torch.multiprocessing.set_sharing_strategy('file_system')
 
 
-def train_val(config, bit):
+def train_val(config, bit, t):
     device = config["device"]
     train_loader, test_loader, dataset_loader, num_train, num_test, num_dataset = get_data(config)
     config["num_train"] = num_train
-    net = config["net"](bit, config).to(device)
+    net = config["net"](bit, t, config).to(device)
 
     optimizer = config["optimizer"]["type"]([
         {"params": net.encoder.parameters(), "lr": config["optimizer"]["lr"]},
@@ -32,8 +32,8 @@ def train_val(config, bit):
 
         current_time = time.strftime('%H:%M:%S', time.localtime(time.time()))
 
-        print("%s[%2d/%2d][%s] bit:%d, dataset:%s, training...." % (
-            config["info"], epoch + 1, config["epoch"], current_time, bit, config["dataset"]), end="")
+        print("%s[%2d/%2d][%s] bit:%d, temperature:%d, dataset:%s, training...." % (
+            config["info"], epoch + 1, config["epoch"], current_time, bit, t, config["dataset"]), end="")
 
         net.train()
 
@@ -100,4 +100,5 @@ if __name__ == "__main__":
     config = get_config()
     print(config)
     for bit in config["bit_list"]:
-        train_val(config, bit)
+        for t in config["temperature"]:
+            train_val(config, bit, t)

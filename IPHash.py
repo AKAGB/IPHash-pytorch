@@ -7,7 +7,7 @@ from models.VTS import CONFIGS, VisionTransformer
 from utils.mask_generator import *
 
 class IPHash(nn.Module):
-    def __init__(self, bit, config):
+    def __init__(self, bit, temperature, config):
         super(IPHash, self).__init__()
         vts_config = CONFIGS['VTS16']
         vts_config.pretrained_dir = 'checkpoints/imagenet21k+imagenet2012_ViT-B_16-224.npz'
@@ -19,7 +19,7 @@ class IPHash(nn.Module):
         # [1000, 768]
         self.centers = self.teacher.head.weight.data 
         self.centers = self.centers.to(config["device"])
-        self.temperature = config["temperature"]
+        self.temperature = temperature
         self.mask_ratio = config["mask_ratio"]
         self.alpha = config["alpha"]
         self.gamma = config["gamma"]
